@@ -1,0 +1,131 @@
+<?php
+
+/**
+ * @file
+ * Provides Clerky module main functionality.
+ */
+
+
+module_load_include('inc', 'clerkly', 'validators');
+module_load_include('inc', 'clerkly', 'helpers');
+
+
+/**
+ * Implements hook_init().
+ */
+
+function clerkly_init() {
+    if (arg(0) != 'admin') {
+        $path = drupal_get_path('module', 'clerkly');
+        drupal_add_library('system', 'jquery');
+        drupal_add_js($path . '/assets/js/helpers.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
+        drupal_add_js($path . '/assets/js/script.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
+    }
+}
+
+/**
+ * Implements hook_menu().
+ */
+
+function clerkly_menu() {
+
+    $items = array();
+
+    $items['admin/config/clerkly'] = array(
+        'title' => 'Clerkly Settings',
+        'description' => 'Here you can define Clerkly module global settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('clerkly_admin_settings'),
+        'access arguments' => array('administer site configuration'),
+        'file' => 'clerkly.admin.inc',
+        'type' => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+
+}
+
+/**
+ * Implements hook_form_field_ui_field_edit_form_alter().
+ */
+
+function clerkly_form_field_ui_field_edit_form_alter(&$form, &$form_state)
+{
+    $field_type = $form['#field']['type'];
+    $instance = $form['#instance'];
+
+    if ($field_type == 'text_with_summary' || $field_type == 'text_long' || $field_type == 'text') {
+        $clerkly_settings = $instance['settings']['clerkly_settings'];
+
+        $form['instance']['settings'] += array(
+            'clerkly_settings' => array(
+                '#type' => 'fieldset',
+                '#title' => t('Clerkly Settings'),
+                '#collapsible' => TRUE,
+                '#collapsed' => FALSE,
+                '#weight' => 100,
+
+                'clerkly_is_active' => array(
+                    '#type' => 'select',
+                    '#title' => t('Activate for current field:'),
+                    '#description' => t('Activates/Deactivates Clerkly typo module for this field'),
+                    '#default_value' => isset($clerkly_settings['clerkly_is_active'])
+                        ? $clerkly_settings['clerkly_is_active'] : true,
+                    '#options' => array(
+                        false => t('Deactivate'),
+                        true => t('Activate'),
+                    ),
+                    '#element_validate' => array('element_validate_rich_text_enabled')
+                ),
+                'clerkly_email_typo' => array(
+                    '#type' => 'textfield',
+                    '#title' => t('Info Email'),
+                    '#description' => t('Information Email that is used for sending of typo information'),
+                    '#default_value' => $clerkly_settings['clerkly_email_typo'],
+                    '#element_validate' => array('element_validate_email')
+
+                ),
+                'clerkly_typo_length' => array(
+                    '#type' => 'textfield',
+                    '#title' => t('Typo Max Length'),
+                    '#description' => t('Selected typo length'),
+                    '#default_value' => $clerkly_settings['clerkly_typo_length'],
+                    '#element_validate' => array('element_validate_integer_positive')
+
+                ),
+                'clerkly_popup_text' => array(
+                    '#type' => 'textfield',
+                    '#maxlength' => 255,
+                    '#title' => t('Popup text'),
+                    '#description' => t('Shows text for user in popup'),
+                    '#default_value' => $clerkly_settings['clerkly_popup_text']
+
+                )
+            )
+
+        );
+    }
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+
+function clerkly_preprocess_field(&$variables)  {
+    $field = &$variables['element'];
+
+    if ($field['#field_type'] == 'text_with_summary' || $field['#field_type'] == 'text_long'
+        || $field['#field_type'] == 'text') {
+
+            $field_settings = _get_usable_settings($field);
+
+            if (isset($field_settings['clerkly_is_active']) && !empty($field_settings['clerkly_is_active'])) {
+                if ($field_settings['clerkly_is_active'] == true && isset($field_settings['clerkly_max_chars'])) {
+                    $variables['classes_array'][] = 'clerkly-field';
+                    $variables['attributes_array'] = array('data-field' => $field['#field_name'],
+                                                            'data-length' => $field_settings['clerkly_max_chars']);
+                }
+            }
+    }
+}
+

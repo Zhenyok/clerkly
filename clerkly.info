@@ -1,0 +1,4 @@
+name = Clerkly
+description = Helps to improve writing literacy
+configure = admin/config/clerkly
+core = 7.x
