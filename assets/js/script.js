@@ -3,7 +3,8 @@
 
     Drupal.behaviors.sendTypoEvent = {
         attach: function(context, settings) {
-            window.addEventListener("keydown", helperFunctions.keyDownEvent);
+            helperFunctions.getSelectedText();
+            $('body').keydown(helperFunctions.keyDownEvent);
         }
     };
 })(jQuery);
