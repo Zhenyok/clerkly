@@ -55,7 +55,12 @@ function clerkly_form_field_ui_field_edit_form_alter(&$form, &$form_state)
     $instance = $form['#instance'];
 
     if ($field_type == 'text_with_summary' || $field_type == 'text_long' || $field_type == 'text') {
-        $clerkly_settings = $instance['settings']['clerkly_settings'];
+
+        $clerkly_settings = array();
+
+        if (isset($instance['settings']['clerkly_settings'])) {
+            $clerkly_settings = $instance['settings']['clerkly_settings'];
+        }
 
         $form['instance']['settings'] += array(
             'clerkly_settings' => array(
@@ -81,7 +86,8 @@ function clerkly_form_field_ui_field_edit_form_alter(&$form, &$form_state)
                     '#type' => 'textfield',
                     '#title' => t('Info Email'),
                     '#description' => t('Information Email that is used for sending of typo information'),
-                    '#default_value' => $clerkly_settings['clerkly_email_typo'],
+                    '#default_value' => isset($clerkly_settings['clerkly_email_typo'])
+                                            ? $clerkly_settings['clerkly_email_typo'] : '',
                     '#element_validate' => array('element_validate_email')
 
                 ),
@@ -89,7 +95,8 @@ function clerkly_form_field_ui_field_edit_form_alter(&$form, &$form_state)
                     '#type' => 'textfield',
                     '#title' => t('Typo Max Length'),
                     '#description' => t('Selected typo length'),
-                    '#default_value' => $clerkly_settings['clerkly_typo_length'],
+                    '#default_value' => isset($clerkly_settings['clerkly_typo_length'])
+                                            ? $clerkly_settings['clerkly_typo_length'] : '',
                     '#element_validate' => array('element_validate_integer_positive')
 
                 ),
@@ -98,7 +105,8 @@ function clerkly_form_field_ui_field_edit_form_alter(&$form, &$form_state)
                     '#maxlength' => 255,
                     '#title' => t('Popup text'),
                     '#description' => t('Shows text for user in popup'),
-                    '#default_value' => $clerkly_settings['clerkly_popup_text']
+                    '#default_value' => isset($clerkly_settings['clerkly_popup_text'])
+                                            ? $clerkly_settings['clerkly_popup_text'] : ''
 
                 )
             )
