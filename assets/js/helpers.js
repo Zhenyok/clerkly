@@ -2,7 +2,7 @@
     "use strict";
 
     window.helperFunctions = window.helperFunctions || {
-        selectedElement:{text:'', dataLength:0, fieldName:'', textLength:0},
+        selectedElement:{text:'', dataLength:0, fieldName:'', textLength:0, popupText:''},
         keyDownEvent: function(event){
             if ((event.ctrlKey) && ((event.keyCode == 0xA)||(event.keyCode == 0xD))) {
                 helperFunctions.verifySelectedTextAndSendRequest();
@@ -15,7 +15,7 @@
                 var textLength = helperFunctions.selectedElement.textLength,
                     dataLength = helperFunctions.selectedElement.dataLength;
 
-                console.log(text);
+                console.log(helperFunctions.selectedElement);
 
                 if (textLength > dataLength) {
                     alert(Drupal.t('Selected text is too long'));
@@ -26,7 +26,7 @@
         },
         getSelectedText: function() {
             $('body').mouseup(function() {
-                helperFunctions.selectedElement = {text:'', dataLength:0, fieldName:'', textLength:0};
+                helperFunctions.selectedElement = {text:'', dataLength:0, fieldName:'', textLength:0, popupText:''};
 
                 if (window.getSelection) {
                     var selection = window.getSelection(),
@@ -37,7 +37,8 @@
                         var selectedElement = null,
                             clerklyElement = null,
                             dataLength = 0,
-                            fieldName = '';
+                            fieldName = '',
+                            popupText = '';
 
                         while (selectedElement = $(selection.focusNode.parentNode)) {
 
@@ -47,11 +48,13 @@
                                 console.log(clerklyElement);
                                 dataLength = parseInt(clerklyElement.attr('data-length'), 10);
                                 fieldName = clerklyElement.attr('data-field');
+                                popupText = clerklyElement.attr('data-popup-text');
                                 helperFunctions.selectedElement = {
                                     text:selectedText,
                                     dataLength:dataLength,
                                     fieldName:fieldName,
-                                    textLength:parseInt(selectedText.length, 10)
+                                    textLength:parseInt(selectedText.length, 10),
+                                    popupText:popupText
                                 };
 
                                 break;

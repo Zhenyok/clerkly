@@ -131,7 +131,8 @@ function clerkly_preprocess_field(&$variables)  {
                 if ($field_settings['clerkly_is_active'] == true && isset($field_settings['clerkly_max_chars'])) {
                     $variables['classes_array'][] = 'clerkly-field';
                     $variables['attributes_array'] = array('data-field' => $field['#field_name'],
-                                                            'data-length' => $field_settings['clerkly_max_chars']);
+                                                            'data-length' => $field_settings['clerkly_max_chars'],
+                                                            'data-popup-text' => $field_settings['clerkly_popup_text']);
                 }
             }
     }
