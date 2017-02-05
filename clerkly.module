@@ -17,6 +17,7 @@ module_load_include('inc', 'clerkly', 'helpers');
 function clerkly_init() {
     if (arg(0) != 'admin') {
         $path = drupal_get_path('module', 'clerkly');
+        drupal_add_css($path . '/assets/css/styles.css', array('group' => CSS_DEFAULT));
         drupal_add_library('system', 'jquery');
         drupal_add_js($path . '/assets/js/helpers.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
         drupal_add_js($path . '/assets/js/script.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
