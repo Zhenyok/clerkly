@@ -1,5 +1,4 @@
 name = Clerkly
 description = Helps to improve writing literacy
-dependencies[]=ctools
 configure = admin/config/clerkly
 core = 7.x

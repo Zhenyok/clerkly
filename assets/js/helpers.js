@@ -15,8 +15,6 @@
                 var textLength = helperFunctions.selectedElement.textLength,
                     dataLength = helperFunctions.selectedElement.dataLength;
 
-                console.log(helperFunctions.selectedElement);
-
                 if (textLength > dataLength) {
                     alert(Drupal.t('Selected text is too long'));
                 } else {
@@ -24,8 +22,54 @@
                 }
             }
         },
+        setSelectedElementObject: function(element, text) {
+            if (element && text && element[0].innerText.match(text)) {
+                var dataLength = parseInt(element.attr('data-length'), 10),
+                    fieldName = element.attr('data-field'),
+                    popupText = element.attr('data-popup-text');
+
+                helperFunctions.selectedElement = {
+                    text:text,
+                    dataLength:dataLength,
+                    fieldName:fieldName,
+                    textLength:parseInt(text.length, 10),
+                    popupText:popupText
+                };
+            }
+        },
+
+        traverseElements: function(selectedElement) {
+            var field,
+                selection = window.getSelection();
+
+            if (selectedElement && selectedElement['nodeName'] !== 'DIV') {
+
+                field = $(selection.anchorNode.parentNode).closest('div[class*="field-name-"]');
+
+                if ($(selection.anchorNode.parentNode).closest('div[class*="field-name-"]').hasClass('clerkly-field')) {
+                    helperFunctions.setSelectedElementObject(field, selectedElement.textContent);
+                }
+
+                return true;
+
+            } else {
+
+                if ($(selectedElement).hasClass('clerkly-field')) {
+                    helperFunctions.setSelectedElementObject($(selectedElement), selectedElement.innerText);
+                    return true;
+                } else if($(selectedElement).closest('div[class*="field-name-"]').hasClass('clerkly-field')) {
+                    helperFunctions.setSelectedElementObject($(selectedElement).closest('div[class*="field-name-"]'),
+                        selectedElement.innerText);
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
         getSelectedText: function() {
             $('body').mouseup(function() {
+
                 helperFunctions.selectedElement = {text:'', dataLength:0, fieldName:'', textLength:0, popupText:''};
 
                 if (window.getSelection) {
@@ -34,32 +78,45 @@
 
                     if (selectedText && selectedText.length > 0) {
 
-                        var selectedElement = null,
-                            clerklyElement = null,
-                            dataLength = 0,
-                            fieldName = '',
-                            popupText = '';
+                        var selection = window.getSelection(),
+                            range = selection.getRangeAt(0),
+                            element = range.cloneContents(),
+                            selectedElement,
+                            field,
+                            start = 0,
+                            finish = 0,
+                            traversed = false;
 
-                        while (selectedElement = $(selection.focusNode.parentNode)) {
+                        if (element) {
 
-                            clerklyElement = selectedElement.closest('div[class*="field-name-"]');
+                            element = $(element)[0].childNodes;
 
-                            if (clerklyElement && clerklyElement.hasClass('clerkly-field')) {
-                                console.log(clerklyElement);
-                                dataLength = parseInt(clerklyElement.attr('data-length'), 10);
-                                fieldName = clerklyElement.attr('data-field');
-                                popupText = clerklyElement.attr('data-popup-text');
-                                helperFunctions.selectedElement = {
-                                    text:selectedText,
-                                    dataLength:dataLength,
-                                    fieldName:fieldName,
-                                    textLength:parseInt(selectedText.length, 10),
-                                    popupText:popupText
-                                };
+                            if (selection.focusNode === range.endContainer) {
+                                start = 0;
+                                finish = element.length;
+                            } else {
+                                start = element.length;
+                                finish = 0;
+                            }
 
-                                break;
+                            if (start < finish) {
+                                for ( var i = start;i < finish; i++ ) {
+                                    if (helperFunctions.traverseElements(element[i]) == true) {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                for ( var i = start;i >= finish; i-- ) {
+                                    if (helperFunctions.traverseElements(element[i]) == true) {
+                                        break;
+                                    }
+                                }
                             }
                         }
+
+                        console.log(helperFunctions.selectedElement);
+
+
                     }
                 }
 
