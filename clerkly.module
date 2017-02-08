@@ -21,6 +21,19 @@ function clerkly_init() {
         drupal_add_library('system', 'jquery');
         drupal_add_js($path . '/assets/js/helpers.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
         drupal_add_js($path . '/assets/js/script.js', array('type' => 'file', 'group' => 'JS_DEFAULT'));
+
+        ctools_include('modal');
+        ctools_modal_add_js();
+
+        drupal_add_js(array(
+            'CToolsModal' => array(
+                'modalSize' => array(
+                    'type' => 'fixed',
+                    'width' => 'auto',
+                    'height' => 'auto',
+                    'contentBottom' => 800),
+            )
+        ), 'setting');
     }
 }
 
@@ -40,6 +53,13 @@ function clerkly_menu() {
         'access arguments' => array('administer site configuration'),
         'file' => 'clerkly.admin.inc',
         'type' => MENU_NORMAL_ITEM,
+    );
+
+    $items['clerkly-popup'] = array(
+        'title' => 'Clerkly Typo Request',
+        'access callback' => true,
+        'page callback' => '_on_modal_show',
+        'type' => MENU_CALLBACK,
     );
 
     return $items;
@@ -138,4 +158,20 @@ function clerkly_preprocess_field(&$variables)  {
             }
     }
 }
+
+/**
+ * Implements hook_theme()
+ */
+
+function clerkly_theme() {
+    return array(
+        'status_messages'=>array(
+            'render element'=>'container',
+            'variables' => array('message' => '')
+        )
+    );
+}
+
+
+
 

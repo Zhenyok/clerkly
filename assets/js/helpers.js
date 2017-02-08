@@ -5,7 +5,7 @@
         selectedElement:{text:'', dataLength:0, fieldName:'', textLength:0, popupText:''},
         keyDownEvent: function(event){
             if ((event.ctrlKey) && ((event.keyCode == 0xA)||(event.keyCode == 0xD))) {
-                helperFunctions.verifySelectedTextAndSendRequest();
+                helperFunctions.generateModalContent();
             }
         },
         verifySelectedTextAndSendRequest: function() {
@@ -18,10 +18,34 @@
                 if (textLength > dataLength) {
                     alert(Drupal.t('Selected text is too long'));
                 } else {
-
+                    return true;
                 }
             }
+
+            return false;
         },
+
+        generateModalContent: function() {
+            if (helperFunctions.verifySelectedTextAndSendRequest() == true) {
+
+                var url  = Drupal.settings.basePath + 'clerkly-popup';
+                var link = $("<a></a>").attr('href', url).addClass('ctools-use-modal-processed').click(Drupal.CTools.Modal.clickAjaxLink);
+
+                Drupal.ajax[url] = new Drupal.ajax(url, link.get(0), {
+                    url: url,
+                    event: 'click',
+                    progress: { type: 'throbber' },
+                    settings:{
+                            width:200,
+                            height:200
+                    }
+                });
+
+                link.click();
+            }
+
+        },
+
         setSelectedElementObject: function(element, text) {
             if (element && text && element[0].innerText.match(text)) {
                 var dataLength = parseInt(element.attr('data-length'), 10),

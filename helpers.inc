@@ -73,3 +73,88 @@ function _get_usable_settings(array $field) {
     return $result;
 }
 
+/**
+ * Implements hook_form.
+ */
+function response_form($form, $form_state) {
+    $form = array();
+    $form['#prefix'] = '<div id="clerkly-popup-window">';
+    $form['#suffix'] = '</div>';
+
+    $form['#attached'] = array('js' => array(
+        'alert("Yay.");' => 'inline'));
+
+    $form['clerkly_info'] = array(
+        '#markup' => '<p id="clerkly-popup-text"></p>'
+    );
+
+    $form['clerkly_comment'] = array(
+        '#title' => t('Write your comment here'),
+        '#type' => 'textfield',
+        '#attributes'=>array('id'=>'clerkly-modal-comment')
+    );
+    $form['field_type'] = array(
+                                '#type' => 'hidden',
+                                '#value' => '',
+                                '#attributes'=>array(
+                                        'id'=>'clerkly-popup-field'
+                                    )
+                                );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Send'),
+        '#ajax'=>array(
+            'callback'=>'_proccess_modal_request',
+            'method'=>'replace',
+            'wrapper'=>'info',
+            'effect' => 'fade'
+        )
+    );
+    return $form;
+}
+
+function _on_modal_show($form, $form_state) {
+
+    $output = drupal_render(drupal_get_form('response_form'));
+    $commands = array();
+    $commands[] = ctools_modal_command_display(t('Send request for text correction'), $output);
+    $commands[] = array('command' => 'setModalData');
+
+    print ajax_render($commands);
+    drupal_exit();
+}
+
+
+
+function _proccess_modal_request($form, $form_state) {
+
+    $field_type = '';
+    $comment = '';
+    $commands = array();
+
+    $commands[] = ajax_command_before('#clerkly-popup-text', theme('status_messages', array('message' => t('Request wasn\'t sent due to error'))));
+    print ajax_render(array('#type' => 'ajax', '#commands' => $commands));
+    drupal_exit();
+
+    if (isset($form_state['input']['field_type']) && !empty($form_state['input']['field_type'])) {
+
+        $field_type = $form_state['input']['field_type'];
+
+    } else {
+
+        $commands[] = ajax_command_before('#clerkly-popup-text', theme('status_messages', array('message' => t('Request wasn\'t sent due to error'))));
+        print ajax_render(array('#type' => 'ajax', '#commands' => $commands));
+        drupal_exit();
+
+    }
+    if (isset($form_state['input']['clerkly_comment'])) {
+        $comment = $form_state['input']['clerkly_comment'];
+    }
+    $commands[] = ajax_command_replace(NULL, render($form));
+
+    $commands[] = ajax_command_before('#clerkly-popup-text', theme('status_messages',array('message' => t('Request was sent'))));
+    $commands[] = ctools_modal_command_dismiss();
+    print ajax_render(array('#type' => 'ajax', '#commands' => $commands));
+    drupal_exit();
+}
+
