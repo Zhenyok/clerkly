@@ -19,6 +19,12 @@
                 $('#clerkly-popup-window #clerkly-popup-text').html(helperFunctions.selectedElement.popupText);
 
             }
+            if (helperFunctions.selectedElement.text) {
+                $('#clerkly-selected-info').before(Drupal.t('Selected text: '));
+                $('#clerkly-selected-info').text(helperFunctions.selectedElement.text);
+                $('#clerkly-selection').val(helperFunctions.selectedElement.text);
+
+            }
         }
     };
 

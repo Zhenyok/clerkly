@@ -18,7 +18,7 @@ function clerkly_admin_settings()
         '#title' => t('Maximum characters in selection'),
         '#required' => true,
         '#default_value' => variable_get('clerkly_max_chars', 20),
-        '#element_validate' => array('element_validate_integer_positive')
+        '#element_validate' => array('element_validate_integer_positive', 'element_validate_max_length')
     );
 
     $form['clerkly_email'] = array(

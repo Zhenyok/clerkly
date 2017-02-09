@@ -1,0 +1,69 @@
+<?php
+
+function clerkly_schema() {
+    $schema['clerkly_log'] = array(
+        'description' => 'Table for storing of all sent typos.',
+        'fields' => array(
+            'id' => array(
+                'description' => 'The primary identifier.',
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE),
+            'uid' => array(
+                'description' => 'Logged in user id.',
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'default' => 0),
+            'ip' => array(
+                'description' => 'IP Address of not logged in user.',
+                'type' => 'long',
+                'length' => 32,
+                'not null' => TRUE,
+                'default' => ''),
+            'node_type' => array(
+                'description' => 'Stores node type.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE),
+            'nid'=> array(
+                'description' => 'Stores node id.',
+                'type' => 'int',
+                'unsigned' => true,
+                'not null' => TRUE),
+            'field_name_ui' =>  array(
+                'description' => 'Stores user-friendly field name.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE),
+            'field_name' =>  array(
+                'description' => 'Stores machine field name.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE),
+            'typo_text' =>  array(
+                'description' => 'Stores typo text.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE),
+            'date_created' =>  array(
+                'description' => 'Typo created date.',
+                'type' => 'Date',
+                'not null' => TRUE,
+                'default' => 'NOW()')
+        ),
+        'indexes' => array(
+            'log_user'        => array('uid'),
+            'log_ip'        => array('ip'),
+        ),
+        'primary key' => array('id'),
+    );
+}
+
+function clerkly_uninstall() {
+    variable_del('clerkly_max_chars');
+    variable_del('clerkly_email');
+    variable_del('clerkly_popup_text');
+    variable_del('clerkly_typo_ip_limit');
+    db_drop_table('clerkly_log');
+}

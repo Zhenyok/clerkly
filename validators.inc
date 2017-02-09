@@ -30,3 +30,11 @@ function element_validate_email_settings($element, &$form_state) {
     }
 
 }
+
+function element_validate_max_length($element, &$form_state) {
+    $value = $element['#value'];
+
+    if (!empty($value) && intval($value) > 255) {
+        form_error($element, t('Maximum typo length is 255 characters'));
+    }
+}

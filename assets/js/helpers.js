@@ -27,8 +27,10 @@
 
         generateModalContent: function() {
             if (helperFunctions.verifySelectedTextAndSendRequest() == true) {
-
-                var url  = Drupal.settings.basePath + 'clerkly-popup';
+                if (!Drupal.settings['nid']) {
+                    return;
+                }
+                var url  = Drupal.settings.basePath + 'clerkly-popup/'+Drupal.settings['nid'];
                 var link = $("<a></a>").attr('href', url).addClass('ctools-use-modal-processed').click(Drupal.CTools.Modal.clickAjaxLink);
 
                 Drupal.ajax[url] = new Drupal.ajax(url, link.get(0), {
