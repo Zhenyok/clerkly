@@ -105,39 +105,6 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
     return $result;
 }
 
-function _verify_vital_settings($field_settings = array()) {
-    $result = false;
-
-    if (!isset($field_settings['clerkly_email_typo']) || empty($field_settings['clerkly_email_typo'])
-        || !isset($field_settings['clerkly_is_active'])) {
-            return $result;
-    }
-
-    if (boolval($field_settings['clerkly_is_active']) == true) {
-        $typo_count = _get_typo_count();
-    }
-}
-
-function _get_typo_count() {
-    global $user;
-
-    $result = 0;
-    $ip_address = ip2long(ip_address());
-    $query = 'SELECT COUNT(id) FROM clerkly_log WHERE log_date = NOW() AND ';
-
-
-
-    if (user_is_logged_in()) {
-        $query .= '(ip_addr = :ip OR uid = :uid)';
-    } else {
-        $query .= 'ip_addr = :ip';
-    }
-
-    $result = db_query($query, array('ip' => $ip_address, 'uid' => $user->uid));
-
-    return $result;
-}
-
 function _get_markup_response($variables) {
 
     if (!isset($variables['message_type']) || !isset($variables['message']) ) {

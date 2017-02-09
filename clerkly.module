@@ -5,6 +5,7 @@
  * Provides Clerky module main functionality.
  */
 
+module_load_include('inc', 'clerkly', 'queries');
 module_load_include('inc', 'clerkly', 'validators');
 module_load_include('inc', 'clerkly', 'helpers');
 

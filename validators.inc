@@ -38,3 +38,29 @@ function element_validate_max_length($element, &$form_state) {
         form_error($element, t('Maximum typo length is 255 characters'));
     }
 }
+
+function _verify_vital_settings($field_settings = array()) {
+    $result = false;
+
+    if (!isset($field_settings['clerkly_email_typo']) || empty($field_settings['clerkly_email_typo'])
+        || !isset($field_settings['clerkly_is_active'])) {
+
+            return $result;
+    }
+
+    if (boolval($field_settings['clerkly_is_active']) == true) {
+
+        if (isset($field_settings['clerkly_typo_ip_limit']) && !empty(isset($field_settings['clerkly_typo_ip_limit']))) {
+            $typo_count = _get_typo_count();
+
+            if ($typo_count >= intval($field_settings['clerkly_typo_ip_limit'])) {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+    return $result;
+}
