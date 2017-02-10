@@ -45,12 +45,13 @@ function _verify_vital_settings($field_settings = array()) {
     if (!isset($field_settings['clerkly_email_typo']) || empty($field_settings['clerkly_email_typo'])
         || !isset($field_settings['clerkly_is_active'])) {
 
+            watchdog('Error: ', 'Clerkly validation error. Email is not set, or field activity is not defined');
             return $result;
     }
 
     if (boolval($field_settings['clerkly_is_active']) == true) {
 
-        if (isset($field_settings['clerkly_typo_ip_limit']) && !empty(isset($field_settings['clerkly_typo_ip_limit']))) {
+        if (isset($field_settings['clerkly_typo_ip_limit']) && !empty($field_settings['clerkly_typo_ip_limit'])) {
             $typo_count = _get_typo_count();
 
             if ($typo_count >= intval($field_settings['clerkly_typo_ip_limit'])) {

@@ -35,7 +35,7 @@ function clerkly_admin_settings()
         '#title' => t('Popup text'),
         '#description' => t('Text that would be displayed for user on Ctrl+Enter click'),
         '#required' => true,
-        '#default_value' => variable_get('clerkly_popup_text', 'Do you want to send a notice to a webmaster?'),
+        '#default_value' => variable_get('clerkly_popup_text', t('Do you want to send a notice to a webmaster?')),
     );
 
     $form['clerkly_typo_ip_limit'] = array(

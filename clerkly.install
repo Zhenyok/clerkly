@@ -44,9 +44,13 @@ function clerkly_schema() {
                 'type' => 'varchar',
                 'length' => 255,
                 'not null' => TRUE),
+            'comment_text' =>  array(
+                'description' => 'User comment.',
+                'type' => 'varchar',
+                'length' => 255),
             'date_created' =>  array(
                 'description' => 'Typo created date.',
-                'mysql_type' => 'Date',
+                'mysql_type' => 'Datetime',
                 'not null' => TRUE)
         ),
         'indexes' => array(
@@ -57,6 +61,12 @@ function clerkly_schema() {
     );
 
     return $schema;
+}
+
+function clerkly_install() {
+    variable_set('clerkly_max_chars', 20);
+    variable_set('clerkly_email', variable_get('site_mail'));
+    variable_set('clerkly_popup_text',t('Do you want to send a notice to a webmaster?'));
 }
 
 function clerkly_uninstall() {

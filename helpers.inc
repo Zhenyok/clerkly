@@ -70,6 +70,12 @@ function _get_usable_settings(array $field) {
         $result['clerkly_popup_text'] = $module_settings['popup_text'];
     }
 
+    if (isset($field['#title']) && !empty($field['#title'])) {
+        $result['field_title'] = $field['#title'];
+    } else {
+        $result['field_title'] = '';
+    }
+
     return $result;
 }
 
@@ -87,6 +93,7 @@ function _on_modal_show($node) {
 }
 
 function _send_form_reply($field_type, $selection, $comment, $node_info) {
+    global $user;
     $result = false;
 
     if (empty($field_type) || !isset($node_info['args']) || !isset($node_info['args'][0])
@@ -100,6 +107,32 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
 
     if (!_verify_vital_settings($field_settings)) {
         return $result;
+    }
+
+    $variables = array(
+                    'node_type' => $node->type,
+                    'nid' => $node->nid,
+                    'field_name_ui' => $field_settings['field_title'],
+                    'field_name' => $field_type,
+                    'request_time' => format_date(strtotime('now'), 'YYYY-MM-DD 00:00:00'),
+                    'typo_text' => $selection,
+                    'comment_text' => $comment
+
+                );
+
+
+    if (user_is_logged_in()) {
+        $variables += array('uid' => $user->uid);
+    } else {
+        $variables += array('ip' => ip2long(ip_address()));
+    }
+
+    $message = drupal_mail('clerkly', 'notice' , $field_settings['clerkly_email_typo'], null, $variables);
+
+    if ($message['send']) {
+//        $message;
+    } else {
+        watchdog('Error: ', 'Email request for text correction was not sent');
     }
 
     return $result;

@@ -151,7 +151,7 @@ function clerkly_preprocess_field(&$variables)  {
             $field_settings = _get_usable_settings($field);
 
             if (isset($field_settings['clerkly_is_active']) && !empty($field_settings['clerkly_is_active'])) {
-                if ($field_settings['clerkly_is_active'] == true && isset($field_settings['clerkly_max_chars'])) {
+                if (boolval($field_settings['clerkly_is_active']) === true && isset($field_settings['clerkly_max_chars'])) {
                     $variables['classes_array'][] = 'clerkly-field';
                     $variables['attributes_array'] = array('data-field' => $field['#field_name'],
                                                             'data-length' => $field_settings['clerkly_max_chars'],
@@ -235,6 +235,8 @@ function clerkly_response_form_submit($form, $form_state) {
                 'message_type' => 'error'));
 
         $commands[] = ajax_command_html('#clerkly-message', $html);
+        watchdog('Error: ', 'Error occurred in clerkly module. field_type is empty');
+
         print ajax_render($commands);
         drupal_exit();
     }
@@ -247,6 +249,8 @@ function clerkly_response_form_submit($form, $form_state) {
                 'message_type' => 'error'));
 
         $commands[] = ajax_command_html('#clerkly-message', $html);
+        watchdog('Error: ', 'Error occurred in clerkly module. String for correction was not selected');
+
         print ajax_render($commands);
         drupal_exit();
     }
@@ -259,7 +263,7 @@ function clerkly_response_form_submit($form, $form_state) {
 
     if (!_send_form_reply($field_type, $selected_text, $comment, $form_state['build_info'])) {
         $html = _get_markup_response(
-            array('message' => t('Request wasn\'t sent due to error'),
+            array('message' => t('Request wasn\'t sent'),
             'message_type' => 'error'));
 
         $commands[] = ajax_command_replace('#clerkly-message-block', $html);
@@ -270,6 +274,54 @@ function clerkly_response_form_submit($form, $form_state) {
 
     print ajax_render($commands);
     drupal_exit();
+}
+
+/**
+ * Implements hook_theme()
+ */
+function clerkly_theme() {
+    $path = drupal_get_path('module', 'clerkly').'/templates';
+
+    return array(
+        'email_request' => array(
+            'variables' => array(
+                                'node_type' => null,
+                                'nid' => null,
+                                'field_name_ui' => null,
+                                'field_name' => null,
+                                'request_time' => null,
+                                'typo_text' => null,
+                                'comment_text' => null
+                            ),
+            'template' => 'custom_email_template',
+            'path' => $path
+        )
+    );
+}
+
+/**
+ * Implements hook_mail()
+ */
+
+function clerkly_mail($key, &$message, $params) {
+
+    try {
+
+        $message['headers'] = array(
+            'MIME-Version' => '1.0',
+            'Content-Type' => 'text/html; charset=iso-8859-1; format=flowed',
+            'Content-Transfer-Encoding' => '8Bit',
+            'X-Mailer' => 'Drupal',
+        );
+
+        $message['subject'] = t('Request for text correction');
+        $message['body'] = theme('email_request', $params);
+
+    } catch(Exception $e) {
+        watchdog('error', $e->getMessage());
+    }
+
+
 }
 
 
