@@ -83,7 +83,7 @@ function _get_usable_settings(array $field) {
 
 function _on_modal_show($node) {
     $commands = array();
-    $output = drupal_render(drupal_get_form('response_form', $node));
+    $output = drupal_get_form('response_form', $node);
 
     $commands[] = ctools_modal_command_display(t('Send request for text correction'), $output);
     $commands[] = array('command' => 'setModalData');
@@ -93,7 +93,9 @@ function _on_modal_show($node) {
 }
 
 function _send_form_reply($field_type, $selection, $comment, $node_info) {
+
     global $user;
+    global $language;
     $result = false;
 
     if (empty($field_type) || !isset($node_info['args']) || !isset($node_info['args'][0])
@@ -114,7 +116,7 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
                     'nid' => $node->nid,
                     'field_name_ui' => $field_settings['field_title'],
                     'field_name' => $field_type,
-                    'request_time' => format_date(strtotime('now'), 'YYYY-MM-DD 00:00:00'),
+                    'date_created' => date('Y-m-d H:i:s', time()),
                     'typo_text' => $selection,
                     'comment_text' => $comment
 
@@ -123,16 +125,24 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
 
     if (user_is_logged_in()) {
         $variables += array('uid' => $user->uid);
-    } else {
-        $variables += array('ip' => ip2long(ip_address()));
     }
 
-    $message = drupal_mail('clerkly', 'notice' , $field_settings['clerkly_email_typo'], null, $variables);
+    $variables += array('ip' => ip2long(ip_address()));
 
-    if ($message['send']) {
-//        $message;
+
+
+    $message = drupal_mail('clerkly', 'clerkly_mail' , $field_settings['clerkly_email_typo'], $language->language, $variables);
+    $message['send'] = true;
+    $message['result'] = true;
+
+    if ($message['send'] && $message['result']) {
+
+        if (!_insert_record_log($variables)) {
+            return false;
+        }
+
     } else {
-        watchdog('Error: ', 'Email request for text correction was not sent');
+        watchdog('mail', 'Email request for text correction was not sent');
     }
 
     return $result;

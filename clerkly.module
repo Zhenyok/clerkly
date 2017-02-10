@@ -55,6 +55,15 @@ function clerkly_menu() {
         'type' => MENU_NORMAL_ITEM,
     );
 
+    $items['admin/config/clerkly/show_log'] = array(
+        'title' => 'Text Correction Requests',
+        'description' => 'Here you can see all text correction requests',
+        'page callback' => 'correction_logs',
+        'access arguments' => array('access administration pages'),
+        'file' => 'clerkly.admin.inc',
+        'type' => MENU_NORMAL_ITEM,
+    );
+
     $items['clerkly-popup/%node'] = array(
         'title' => 'Clerkly Typo Request',
         'access callback' => true,
@@ -289,11 +298,17 @@ function clerkly_theme() {
                                 'nid' => null,
                                 'field_name_ui' => null,
                                 'field_name' => null,
-                                'request_time' => null,
+                                'date_created' => null,
                                 'typo_text' => null,
-                                'comment_text' => null
+                                'comment_text' => null,
+                                'ip' => null,
+                                'uid' => null
                             ),
             'template' => 'custom_email_template',
+            'path' => $path
+        ),
+        'get_correction_logs' => array(
+            'template' => 'custom_correction_logs',
             'path' => $path
         )
     );
@@ -304,23 +319,37 @@ function clerkly_theme() {
  */
 
 function clerkly_mail($key, &$message, $params) {
+    if ($key == 'clerkly_mail') {
+        try {
+            $headers = array(
+                'MIME-Version' => '1.0',
+                'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+                'Content-Transfer-Encoding' => '8bit',
+                'X-Mailer' => 'Drupal',
+            );
 
-    try {
+            if (isset($params['ip']) && !empty($params['ip'])) {
+                $params['ip'] = long2ip($params['ip']);
+            }
 
-        $message['headers'] = array(
-            'MIME-Version' => '1.0',
-            'Content-Type' => 'text/html; charset=iso-8859-1; format=flowed',
-            'Content-Transfer-Encoding' => '8Bit',
-            'X-Mailer' => 'Drupal',
-        );
+            if (isset($params['uid']) && !empty($params['uid'])) {
 
-        $message['subject'] = t('Request for text correction');
-        $message['body'] = theme('email_request', $params);
+                $user_info = user_load($params['uid']);
 
-    } catch(Exception $e) {
-        watchdog('error', $e->getMessage());
+                if (is_object($user_info) && !empty($user_info->name)) {
+                    $params['uid'] = $user_info->name;
+                }
+
+            }
+
+            $body = theme('email_request', $params);
+            $message['subject'] = t('Request for text correction');
+            $message['body'][] = $body;
+            $message['headers'] = array_replace($message['headers'], $headers);
+        } catch(Exception $e) {
+            watchdog('mail', $e->getMessage());
+        }
     }
-
 
 }
 
