@@ -50,5 +50,46 @@ function clerkly_admin_settings()
 }
 
 function correction_logs() {
-    return 'TEST';
+
+    $header = array(
+        array('data' => t('Username'),'field' => 'u.name', 'sort' => 'ASC'),
+        array('data' => t('IP Address'),'field' => 'ip', 'sort' => 'ASC'),
+        array('data' => t('Field UI'),'field' => 'field_name_ui', 'sort' => 'ASC'),
+        array('data' => t('Field Machine name'),'field' => 'field_name', 'sort' => 'ASC'),
+        array('data' => t('Node Type'),'field' => 'node_type'),
+        array('data' => t('Selected text')),
+        array('data' => t('User comment')),
+        array('data' => t('Created Date'), 'field' => 'date_created', 'sort' => 'DESC')
+    );
+
+    $result = _get_table_rows($header);
+
+    $rows = array();
+
+    foreach ($result as $row) {
+
+        $rows[] = array(
+                    'data' => array(
+                        $row->name,
+                        long2ip($row->ip),
+                        $row->field_name_ui,
+                        $row->field_name,
+                        l($row->node_type, $row->node_url),
+                        $row->typo_text,
+                        $row->comment_text,
+                        $row->date_created
+                    )
+
+        );
+    }
+
+    $output = theme('table', array('header' => $header,
+                                    'rows' => $rows,
+                                    'caption' => '<h2>'.t('USER CORRECTION LIST').'</h2>'
+                            )
+                );
+
+    $output .= theme('pager');
+
+    return $output;
 }

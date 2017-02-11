@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Provides Database query layer.
+ */
+
 function _get_typo_count() {
 
     $result = 0;
@@ -21,7 +26,7 @@ function _insert_record_log($params = array()) {
 
         $fields = array(
             'node_type' => $params['node_type'],
-            'nid' => $params['nid'],
+            'node_url' => $params['node_url'],
             'field_name_ui' => $params['field_name_ui'],
             'field_name' => $params['field_name'],
             'date_created' => $params['date_created'],
@@ -50,4 +55,23 @@ function _insert_record_log($params = array()) {
     }
 
     return $is_inserted;
+}
+
+function _get_table_rows($header) {
+
+    $query = db_select('clerkly_log', 'c');
+    $query->innerJoin('users', 'u', 'c.uid = u.uid');
+    $result = $query->fields('c', array(
+            'ip', 'node_type', 'node_url',
+            'field_name', 'field_name_ui',
+            'typo_text', 'comment_text',
+            'date_created'
+        )
+    )
+        ->fields('u', array('name'))
+        ->extend('TableSort')->extend('PagerDefault')->limit(20)
+        ->orderByHeader($header)
+        ->execute();
+
+    return $result;
 }

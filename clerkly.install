@@ -24,10 +24,10 @@ function clerkly_schema() {
                 'type' => 'varchar',
                 'length' => 255,
                 'not null' => TRUE),
-            'nid'=> array(
-                'description' => 'Stores node id.',
-                'type' => 'int',
-                'unsigned' => true,
+            'node_url'=> array(
+                'description' => 'Stores node url.',
+                'type' => 'varchar',
+                'length' => 255,
                 'not null' => TRUE),
             'field_name_ui' =>  array(
                 'description' => 'Stores user-friendly field name.',

@@ -17,6 +17,7 @@
 
                 if (textLength > dataLength) {
                     alert(Drupal.t('Selected text is too long'));
+                    return;
                 } else {
                     return true;
                 }
@@ -92,7 +93,6 @@
 
             return false;
         },
-
         getSelectedText: function() {
             $('body').mouseup(function() {
 
@@ -104,8 +104,7 @@
 
                     if (selectedText && selectedText.length > 0) {
 
-                        var selection = window.getSelection(),
-                            range = selection.getRangeAt(0),
+                        var range = selection.getRangeAt(0),
                             element = range.cloneContents(),
                             selectedElement,
                             field,
@@ -113,7 +112,7 @@
                             finish = 0,
                             traversed = false;
 
-                        if (element) {
+                        if (element && $(element)[0] && $(element)[0].childNodes) {
 
                             element = $(element)[0].childNodes;
 
