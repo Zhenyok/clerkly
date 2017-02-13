@@ -5,12 +5,12 @@
  */
 
 function element_validate_rich_text_enabled(&$element, &$form_state) {
-    $value = &$element['#value'];
+/*    $value = &$element['#value'];
     $settings = $form_state['values']['instance']['settings'];
 
     if ($value == true && $settings['text_processing'] == 0) {
         form_set_value($element, false, $form_state);
-    }
+    }*/
 }
 
 function element_validate_email($element, &$form_state) {
