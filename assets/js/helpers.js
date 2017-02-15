@@ -32,7 +32,8 @@
                     return;
                 }
                 var url  = Drupal.settings.basePath + 'clerkly-popup/'+Drupal.settings['nid'];
-                var link = $("<a></a>").attr('href', url).addClass('ctools-use-modal-processed').click(Drupal.CTools.Modal.clickAjaxLink);
+                var link = $("<a></a>").attr('href', url).addClass('ctools-use-modal-processed')
+                                                        .click(Drupal.CTools.Modal.clickAjaxLink);
 
                 Drupal.ajax[url] = new Drupal.ajax(url, link.get(0), {
                     url: url,
@@ -125,22 +126,19 @@
                             }
 
                             if (start < finish) {
-                                for ( var i = start;i < finish; i++ ) {
+                                for ( var i = start; i < finish; i++ ) {
                                     if (helperFunctions.traverseElements(element[i]) == true) {
                                         break;
                                     }
                                 }
                             } else {
-                                for ( var i = start;i >= finish; i-- ) {
+                                for ( var i = start; i >= finish; i-- ) {
                                     if (helperFunctions.traverseElements(element[i]) == true) {
                                         break;
                                     }
                                 }
                             }
                         }
-
-                        console.log(helperFunctions.selectedElement);
-
 
                     }
                 }

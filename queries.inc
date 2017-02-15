@@ -5,7 +5,8 @@
  * Provides Database query layer.
  */
 
-function _get_typo_count() {
+function _get_typo_count()
+{
 
     $result = 0;
     $ip_address = ip2long(ip_address());
@@ -18,7 +19,8 @@ function _get_typo_count() {
     return $result;
 }
 
-function _insert_record_log($params = array()) {
+function _insert_record_log($params = array())
+{
 
     $is_inserted = false;
 
@@ -57,7 +59,8 @@ function _insert_record_log($params = array()) {
     return $is_inserted;
 }
 
-function _get_table_rows($header) {
+function _get_table_rows($header)
+{
 
     $query = db_select('clerkly_log', 'c');
     $query->innerJoin('users', 'u', 'c.uid = u.uid');
@@ -68,10 +71,10 @@ function _get_table_rows($header) {
             'date_created'
         )
     )
-        ->fields('u', array('name'))
-        ->extend('TableSort')->extend('PagerDefault')->limit(20)
-        ->orderByHeader($header)
-        ->execute();
+    ->fields('u', array('name'))
+    ->extend('TableSort')->extend('PagerDefault')->limit(20)
+    ->orderByHeader($header)
+    ->execute();
 
     return $result;
 }

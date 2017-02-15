@@ -5,7 +5,9 @@
  * Provides Helper functions logic.
  */
 
-function _get_field_settings($field) {
+function _get_field_settings($field)
+{
+
     $result = array();
     if (isset($field['#entity_type']) && isset($field['#field_name']) && isset($field['#bundle'])) {
 
@@ -19,7 +21,8 @@ function _get_field_settings($field) {
     return $result;
 }
 
-function _get_clerkly_settings() {
+function _get_clerkly_settings()
+{
 
     $result = &drupal_static(__FUNCTION__);
 
@@ -32,7 +35,7 @@ function _get_clerkly_settings() {
 
         $result = array(
             'max_chars' => (int) $max_chars,
-            'email' =>$email,
+            'email' => $email,
             'popup_text' => $popup_text,
             'typo_ip_limit' => $typo_ip_limit
         );
@@ -41,7 +44,9 @@ function _get_clerkly_settings() {
     return $result;
 }
 
-function _get_usable_settings(array $field) {
+function _get_usable_settings(array $field)
+{
+
     $result = array();
 
     $module_settings = _get_clerkly_settings();
@@ -52,39 +57,34 @@ function _get_usable_settings(array $field) {
     if (isset($field_settings['clerkly_is_active']) && !empty($field_settings['clerkly_is_active'])) {
         $result['clerkly_is_active'] = $field_settings['clerkly_is_active'];
 
-    }
-    else {
+    } else {
         $result['clerkly_is_active'] = false;
     }
 
     if (isset($field_settings['clerkly_email_typo']) && !empty($field_settings['clerkly_email_typo'])) {
         $result['clerkly_email_typo'] = $field_settings['clerkly_email_typo'];
 
-    }
-    else {
+    } else {
         $result['clerkly_email_typo'] = $module_settings['email'];
     }
 
     if (isset($field_settings['clerkly_typo_length']) && !empty($field_settings['clerkly_typo_length'])) {
         $result['clerkly_max_chars'] = $field_settings['clerkly_typo_length'];
 
-    }
-    else {
+    } else {
         $result['clerkly_max_chars'] = $module_settings['max_chars'];
     }
 
     if (isset($field_settings['clerkly_popup_text']) && !empty($field_settings['clerkly_popup_text'])) {
         $result['clerkly_popup_text'] = $field_settings['clerkly_popup_text'];
 
-    }
-    else {
+    } else {
         $result['clerkly_popup_text'] = $module_settings['popup_text'];
     }
 
     if (isset($field['#title']) && !empty($field['#title'])) {
         $result['field_title'] = $field['#title'];
-    }
-    else {
+    } else {
         $result['field_title'] = '';
     }
 
@@ -93,7 +93,9 @@ function _get_usable_settings(array $field) {
 
 
 
-function _on_modal_show($node) {
+function _on_modal_show($node)
+{
+
     $commands = array();
     $output = drupal_get_form('response_form', $node);
 
@@ -104,7 +106,8 @@ function _on_modal_show($node) {
     drupal_exit();
 }
 
-function _send_form_reply($field_type, $selection, $comment, $node_info) {
+function _send_form_reply($field_type, $selection, $comment, $node_info)
+{
 
     global $user;
     global $language;
@@ -124,15 +127,15 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
     }
 
     $variables = array(
-                    'node_type' => $node->type,
-                    'node_url' => url('node/'. $node->nid),
-                    'field_name_ui' => $field_settings['field_title'],
-                    'field_name' => $field_type,
-                    'date_created' => date('Y-m-d H:i:s', time()),
-                    'typo_text' => $selection,
-                    'comment_text' => $comment
+        'node_type' => $node->type,
+        'node_url' => url('node/'. $node->nid),
+        'field_name_ui' => $field_settings['field_title'],
+        'field_name' => $field_type,
+        'date_created' => date('Y-m-d H:i:s', time()),
+        'typo_text' => $selection,
+        'comment_text' => $comment
 
-                );
+    );
 
 
     if (user_is_logged_in()) {
@@ -144,7 +147,7 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
 
 
     $message = drupal_mail('clerkly', 'clerkly_mail' , $field_settings['clerkly_email_typo'],
-                            $language->language, $variables);
+                $language->language, $variables);
 
     if ($message['send'] && $message['result']) {
 
@@ -159,7 +162,8 @@ function _send_form_reply($field_type, $selection, $comment, $node_info) {
     return $result;
 }
 
-function _get_markup_response($message_type) {
+function _get_markup_response($message_type)
+{
 
     if (!isset($message_type)) {
         return '';
@@ -168,8 +172,7 @@ function _get_markup_response($message_type) {
 
     if ($message_type == 'error') {
         $message = t('Request wasn\'t sent due to error');
-    }
-    else {
+    } else {
         $message = t('Thanks for your request.');
     }
 

@@ -49,7 +49,8 @@ function clerkly_admin_settings()
     return system_settings_form($form);
 }
 
-function correction_logs() {
+function correction_logs()
+{
 
     $header = array(
         array('data' => t('Username'),'field' => 'u.name', 'sort' => 'ASC'),
@@ -69,23 +70,24 @@ function correction_logs() {
     foreach ($result as $row) {
 
         $rows[] = array(
-                    'data' => array(
-                        $row->name,
-                        long2ip($row->ip),
-                        $row->field_name_ui,
-                        $row->field_name,
-                        l($row->node_type, $row->node_url),
-                        $row->typo_text,
-                        $row->comment_text,
-                        $row->date_created
-                    )
+            'data' => array(
+                $row->name,
+                long2ip($row->ip),
+                $row->field_name_ui,
+                $row->field_name,
+                l($row->node_type, $row->node_url),
+                $row->typo_text,
+                $row->comment_text,
+                $row->date_created
+            )
 
         );
     }
 
-    $output = theme('table', array('header' => $header,
-                                    'rows' => $rows,
-                                    'caption' => '<h2>'.t('USER CORRECTION LIST').'</h2>'
+    $output = theme('table', array(
+                                'header' => $header,
+                                'rows' => $rows,
+                                'caption' => '<h2>'.t('USER CORRECTION LIST').'</h2>'
                             )
                 );
 

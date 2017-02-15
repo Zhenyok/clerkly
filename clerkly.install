@@ -1,6 +1,16 @@
 <?php
 
-function clerkly_schema() {
+/**
+ * @file
+ * Defines schema structure.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+
+function clerkly_schema()
+{
     $schema['clerkly_log'] = array(
         'description' => 'Table for storing of all sent typos.',
         'fields' => array(
@@ -54,8 +64,8 @@ function clerkly_schema() {
                 'not null' => TRUE)
         ),
         'indexes' => array(
-            'log_user'        => array('uid'),
-            'log_ip'        => array('ip'),
+            'log_user' => array('uid'),
+            'log_ip' => array('ip'),
         ),
         'primary key' => array('id'),
     );
@@ -63,13 +73,23 @@ function clerkly_schema() {
     return $schema;
 }
 
-function clerkly_install() {
+/**
+ * Implements hook_install().
+ */
+
+function clerkly_install()
+{
     variable_set('clerkly_max_chars', 20);
     variable_set('clerkly_email', variable_get('site_mail'));
     variable_set('clerkly_popup_text',t('Do you want to send a notice to a webmaster?'));
 }
 
-function clerkly_uninstall() {
+/**
+ * Implements hook_uninstall().
+ */
+
+function clerkly_uninstall()
+{
     variable_del('clerkly_max_chars');
     variable_del('clerkly_email');
     variable_del('clerkly_popup_text');
